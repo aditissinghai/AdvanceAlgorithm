@@ -1,8 +1,12 @@
 package SnakesAndTheirCoupAgainstTheMongoose;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Codechef {
+
+    static List<Integer> res = new ArrayList<>();
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         int t = s.nextInt();
@@ -11,46 +15,60 @@ public class Codechef {
 
         while(t-- > 0) {
             int n = s.nextInt();
+
             s1 = s.next();
             s2 = s.next();
 
-            // counting snakes in each string
-            int[] snakeCount = new int[2];
-            int fences = 0;
+            boolean firstLine = false;
+            boolean secondLine = false;
 
-            for (int i = 0; i < n; i++) {
-                if(s1.charAt(i) == '*')
-                    snakeCount[0]++;
-                if(s2.charAt(i)=='*')
-                    snakeCount[1]++;
-            }
+            boolean up = false;
+            boolean down = false;
 
-            // Count number of fences
-            if(snakeCount[0] > 0 && snakeCount[1] > 0) {
-                fences = 1;
-                snakeCount[0] = 0;
-                snakeCount[1] = 1;
+            int count = 0;
 
-                for (int i = 0; i < n; i++) {
-                    if(s1.charAt(i) == '*')
-                        snakeCount[0]++;
-                    if(s2.charAt(i)=='*')
-                        snakeCount[1]++;
+            for(int i=0;i<n;i++){
+                if(s1.charAt(i) == '*' && s2.charAt(i) == '*'){
+                    firstLine = true;
+                    secondLine = true;
 
-                    if(snakeCount[0] > 1 && snakeCount[1] > 1) {
-                        fences++;
-                        snakeCount[0] = 0;
-                        snakeCount[1] = 1;
-                        i--;
-                    }
+                    if(up || down)
+                        count++;
+
+                    up = true;
+                    down  = true;
+                    continue;
                 }
-            } else if(snakeCount[0] == 0 && snakeCount[1] > 1 || snakeCount[0] > 1 && snakeCount[1] == 0) {
-                fences = Math.max(snakeCount[0], snakeCount[1])-1;
-            } else {
-                fences = 0;
+                if(s1.charAt(i) == '*' && s2.charAt(i) == '.'){
+                    firstLine = true;
+                    if(up){
+                        count++;
+                        down = false;
+                    }
+                    up = true;
+                    continue;
+                }
+
+                if(s1.charAt(i) == '.' && s2.charAt(i) == '*'){
+                    secondLine = true;
+                    if(down){
+                        count++;
+                        up = false;
+                    }
+                    down = true;
+                    continue;
+                }
             }
 
-            System.out.println(fences);
+            if(firstLine && secondLine)
+                count++;
+
+            res.add(count);
+
+    }
+
+        for(Integer i:res ) {
+            System.out.println(i);
         }
     }
 }

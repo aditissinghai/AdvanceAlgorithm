@@ -15,6 +15,10 @@ public class AshtonAndString {
            ans.add(findKthCharacter(s,k));
         }
 
+        for(Character res : ans) {
+            System.out.println(res);
+        }
+
     }
 
     private static char findKthCharacter(String s, int k) {

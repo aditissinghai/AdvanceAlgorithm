@@ -23,7 +23,6 @@ class Solution {
 
     public static int findCircleNum(int[][] M) {
 
-
         if(M.length == 0 || M[0].length == 0) {
             return 0;
         }
@@ -31,7 +30,6 @@ class Solution {
         int len = M.length;
 
         UnionFind uf = new UnionFind(len);
-
 
         for(int row = 0; row < len; row++) {
             for(int col = row+1; col < len; col++) {
@@ -52,18 +50,14 @@ class Solution {
 
 
     static class UnionFind {
-
         public int[] parent;
 
         public UnionFind(int len) {
             parent = new int[len];
             Arrays.fill(parent, -1);
-
         }
-
         // check if val1 and val2 have same parents, if not assign parent.
         public void union(int val1, int val2) {
-
             int root1 = find(val1);
             int root2 = find(val2);
 

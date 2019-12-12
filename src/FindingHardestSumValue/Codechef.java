@@ -86,6 +86,8 @@ class Codechef
             col++;
         }
 
+        // Finding minimum in Bottom to Top direction // North
+
         for(int i = 0; i < M; i++) {
             dpTop[N-1][i] = a[N-1][i];
         }
