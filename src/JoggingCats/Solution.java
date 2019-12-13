@@ -1,80 +1,81 @@
 package JoggingCats;
-
-import java.io.*;
 import java.util.*;
-import java.text.*;
-import java.math.*;
-import java.util.regex.*;
 
 public class Solution {
 
-    public static void main(String[] args) throws Exception{
-        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int intersections = sc.nextInt();
+        int edges = sc.nextInt();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        ArrayList<ArrayList<Integer>> neighbors = new ArrayList<>();
 
-        String line1 = br.readLine();
-        String arr[] = line1.split(" ");
-
-        int M = Integer.parseInt(arr[1]);
-        int N = Integer.parseInt(arr[0]);
-
-        String inputs[] = new String[M];
-        for(int i = 0; i < M; i++) {
-            inputs[i] = br.readLine();
-        }
-        br.close();
-
-        Node nodes[] = new Node[N+1];
-
-        // Initialize the graph
-        for(int i = 1; i <= N; i++) {
-            nodes[i] = new Node();
-            nodes[i].links = new ArrayList<>();
+        for (int i = 0; i < intersections; ++i) {
+            neighbors.add(new ArrayList<>());
         }
 
-        // Fill the values in the bidirectional graph
-        for(int i = 0; i < M; i++) {
-            String[] line = inputs[i].split(" ");
-            int x = Integer.parseInt(line[0]);
-            int y = Integer.parseInt(line[1]);
-
-            nodes[x].links.add(y);
-            nodes[y].links.add(x);
+        for (int i = 0; i < edges; i++) {
+            int src = sc.nextInt() - 1;
+            int dest = sc.nextInt() - 1;
+            neighbors.get(src).add(dest);
+            neighbors.get(dest).add(src);
         }
 
-        long routes = 0;
+        int[][] paths = new int[intersections][];
+        for (int i = 0; i < intersections; i++) {
+            paths[i] = new int[neighbors.get(i).size()];
+            int index = 0;
+            for (int item : neighbors.get(i)) {
+                paths[i][index++] = item;
+            }
+            Arrays.sort(paths[i]);
+        }
 
-        for(int i = 1; i <= N; i++) {
-            Node cur = nodes[i];
-            Map<Integer, Integer> routeCount = new HashMap<>();
-            for(int link: cur.links) {
-                // Explore their links too
-                Node neigh = nodes[link];
-                for(int l : neigh.links) {
-                    // check if there is no cycle
-                    if(l!=i) {
-                        routeCount.put(l, routeCount.getOrDefault(l, 0)+1);
+        int factor = 25;
+        long[] neighborsCalculations = new long[edges * factor];
+        int len = 0;
+        long pathCount = 0;
+        for (int i = 0; i < intersections; ++i) {
+            if (paths[i].length <= factor) {
+                for (int j = 0; j < paths[i].length; j++) {
+                    for (int k = j + 1; k < paths[i].length; k++) {
+                        neighborsCalculations[len++] = (intersections * paths[i][j]) + paths[i][k];
                     }
                 }
-            }
-
-            for(Map.Entry<Integer,Integer> e: routeCount.entrySet()){
-                System.out.println("Key: "+e.getKey()+" Value: "+e.getValue());
-                routes += choose2(e.getValue());
+            } else {
+                boolean[] overFactor = new boolean[intersections];
+                for (int j : paths[i]) {
+                    overFactor[j] = true;
+                }
+                for (int j = 0; j < intersections; j++) {
+                    if (paths[j].length > factor && j <= i) {
+                        continue;
+                    }
+                    long num = 0;
+                    for (int k : paths[j]) {
+                        if (overFactor[k]) {
+                            num++;
+                        }
+                    }
+                    pathCount += (num * (num - 1)) / 2;
+                }
             }
         }
 
-        System.out.println(routes/4);
-    }
+        Arrays.sort(neighborsCalculations, 0, len);
 
-
-    static long choose2(long n){
-        return (n*(n-1))/2;
-    }
-
-    static class Node {
-        List<Integer> links;
+        int i = 0;
+        while (i < len) {
+            int j = i;
+            while (j < neighborsCalculations.length && neighborsCalculations[i] == neighborsCalculations[j]) {
+                j++;
+            }
+            int num = j - i;
+            pathCount += (num * (num - 1)) / 2;
+            i = j;
+        }
+        if (pathCount % 2 == 0) {
+            System.out.println(pathCount / 2);
+        }
     }
 }
-

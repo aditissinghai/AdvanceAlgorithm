@@ -14,7 +14,6 @@ class Solution {
         putOne(M, 2, 2);
 
         System.out.println(findCircleNum(M));
-
     }
 
     private static void putOne(int[][] m, int row, int col) {
@@ -73,8 +72,5 @@ class Solution {
             // finds the highest value of parent available
             return find(parent[val]);
         }
-
-
     }
-
 }

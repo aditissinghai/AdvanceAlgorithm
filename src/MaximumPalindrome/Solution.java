@@ -1,151 +1,71 @@
 package MaximumPalindrome;
 
 import java.io.*;
-import java.math.*;
-import java.security.*;
-import java.text.*;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.regex.*;
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-class Result {
+        mod=(int)1e9+7;
+        int max=(int)(1e5+5);
 
-    static int[][] dp;
-    static int []fact = new int[100005];
-    static int mod = 1000000007;
+        int [] fac=new int [max];
+        int [] inv=new int [max];
 
-    /*
-     * Complete the 'initialize' function below.
-     *
-     * The function accepts STRING s as parameter.
-     */
+        fac[0]=1;
+        for(int i=1;i<max;i++)
+            fac[i]=(int)(1L*fac[i-1]*i%mod);
+        for(int i=0;i<max;i++)
+            inv[i]=(int)inv(fac[i]);
 
-    public static void initialize(String s) {
-        // This function is called once before all queries.
-        dp = new int[26][s.length()];
+        char [] s=br.readLine().toCharArray();
+        int n=s.length;
+        int q=Integer.parseInt(br.readLine());
 
-
-        // Keeping track of occurrences of every character
-        for (int i = 0; i < 26; i++)
-        {
-            if(s.charAt(0)-'a' == i)
-                dp[i][0] = 1;
-            for (int j = 1; j < dp[i].length; j++)
-            {
-                dp[i][j] = dp[i][j-1];
-                if(s.charAt(j)-'a' == i)
-                    dp[i][j]++;
-            }
+        int [][] dp=new int [n][26];
+        dp[0][s[0]-'a']++;
+        for(int i=1;i<n;i++){
+            for(int j=0;j<26;j++)
+                dp[i][j]+=dp[i-1][j];
+            dp[i][s[i]-'a']++;
         }
+        while(q-->0){
+            String query[] = br.readLine().split(" ");
+            int l=Integer.parseInt(query[0])-1;
+            int r=Integer.parseInt(query[1])-1;
 
-       /* for(int  i =0 ; i < 26; i++) {
-            for(int j = 0; j < dp[i].length; j++) {
-                System.out.print(dp[i][j]+" ");
+            int odd=0;
+            int even=0;
+
+            int [] f=new int [26];
+            long res=1;
+
+            for(int i=0;i<26;i++){
+                f[i]=dp[r][i];
+                if(l>0)
+                    f[i]-=dp[l-1][i];
+                if(f[i]%2==1){
+                    odd++;
+                    f[i]--;
+                }
+                f[i]/=2;
+                res=(res*inv[f[i]])%mod;
+                even+=f[i];
             }
-            System.out.println();
-        }*/
-
-       // Pre calculating the factorial values
-        fact[0] = 1;
-        for (int i = 1; i < fact.length; i++) {
-            fact[i] = i*fact[i-1]%mod;      // To avoid overflow of integer range
+            res=(res*fac[even])%mod;
+            if(odd>0)
+                res*=odd;
+            res%=mod;
+            System.out.println(res);
         }
-
-
     }
-
-    /*
-     * Complete the 'answerQuery' function below.
-     *
-     * The function is expected to return an INTEGER.
-     * The function accepts following parameters:
-     *  1. INTEGER l
-     *  2. INTEGER r
-     */
-
-    public static int answerQuery(int l, int r) {
-        // Return the answer for this query modulo 1000000007.
-
-        l--; // wrt array pointers
-        r--; // wrt array pointers
-
-        int f[] = new int[26];
-
-        for(int i = 0; i < 26; i++) {
-            f[i] = dp[i][r];
-            if( l > 0) {
-                f[i] = f[i] - dp[i][l-1]; // why subtract
-            }
-//            System.out.println(i + " : " +f[i]);
-        }
-
-        int even = 0;
-        int odd = 0;
-
-        for(int i = 0; i < f.length; i++) {
-            even += f[i]/2;
-            odd += f[i]%2;
-        }
-
-        long res = fact[even];
-        if(odd > 0) {
-            res = ((res%mod) * (odd%mod));
-        }
-
-        for(int i = 0; i < f.length; i++) {
-            if(f[i] > 1) {
-                res = (res%mod) * (inv(fact[f[i]/2])%mod);
-            }
-        }
-
-        return (int)res;
-    }
-
-    static long inv(long x) {
-        long r, y;
-
-        r = 1;
-        y = mod - 2;
-
-        while(y!=0) {
-
-            // y & 1 produces value which is either 1 or 0
-            // y & 1 == y % 2
-            if ((y & 1) == 1)
-                r = r * x % mod;
-
-            // Set y to itself by shifting one bit to the right
-            // y >> 1 is equivalent to y/2;
-            y >>=1;
-            x = x*x;
-        }
-
+    static int mod;
+    public static long inv(long x){
+        long r,y;
+        for(r=1,y=mod-2;y!=0;x=x*x%mod,y>>=1)
+            if((y&1)==1)
+                r=r*x%mod;
         return r;
     }
 
-}
-
-public class Solution {
-    public static void main(String[] args) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-
-        String s = bufferedReader.readLine();
-
-        Result.initialize(s);
-
-        int q = Integer.parseInt(bufferedReader.readLine().trim());
-
-        for (int qItr = 0; qItr < q; qItr++) {
-            String[] firstMultipleInput = bufferedReader.readLine().replaceAll("\\s+$", "").split(" ");
-
-            int l = Integer.parseInt(firstMultipleInput[0]);
-
-            int r = Integer.parseInt(firstMultipleInput[1]);
-
-            int result = Result.answerQuery(l, r);
-
-            System.out.println(String.valueOf(result));
-        }
-        bufferedReader.close();
-    }
 }
